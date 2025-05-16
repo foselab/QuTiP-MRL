@@ -4,6 +4,7 @@ import numpy as np
 import qutip as qt
 
 import qutrit_matrices
+import ascii_visualization
 
 
 class QuditCircuit:
