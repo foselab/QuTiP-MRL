@@ -3,6 +3,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import qutip as qt
 
+import qutrit_matrices
+
+
 class QuditCircuit:
 
     def __init__(self, num_qudit: int, num_states: int=3):
