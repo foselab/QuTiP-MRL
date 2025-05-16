@@ -22,5 +22,45 @@ Q2   ----------------------------| 0 2 |-------------
 
 example.simulate_einsum()
 
+'''
+OUTPUT:
+
+QUDIT 0 state probabilities:
+  1
+  0
+  0
+QUDIT 1 state probabilities:
+  0
+  1
+  0
+QUDIT 2 state probabilities:
+  0
+  0
+  1
+'''
+
 example.simulate_fullmatrix()
+
+'''
+OUTPUT:
+
+QUDIT 0 Density Matrix:
+Quantum object: dims=[[3], [3]], shape=(3, 3), type='oper', dtype=Dense, isherm=True
+Qobj data =
+[[1. 0. 0.]
+ [0. 0. 0.]
+ [0. 0. 0.]]
+QUDIT 1 Density Matrix:
+Quantum object: dims=[[3], [3]], shape=(3, 3), type='oper', dtype=Dense, isherm=True
+Qobj data =
+[[0. 0. 0.]
+ [0. 1. 0.]
+ [0. 0. 0.]]
+QUDIT 2 Density Matrix:
+Quantum object: dims=[[3], [3]], shape=(3, 3), type='oper', dtype=Dense, isherm=True
+Qobj data =
+[[0. 0. 0.]
+ [0. 0. 0.]
+ [0. 0. 1.]]
+'''
 
