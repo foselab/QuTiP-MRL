@@ -1,3 +1,8 @@
+from math import ceil
+import matplotlib.pyplot as plt
+import numpy as np
+import qutip as qt
+
 class QuditCircuit:
 
     def __init__(self, num_qudit: int, num_states: int=3):
@@ -324,8 +329,6 @@ class QuditCircuit:
     # Function used by the Class to create the graphic Matplotlib circuit
            
     def __mpl_draw(self, max_gates=20): # Splits the drawing after 20 gates
-     from math import ceil
-
      total_gates = len(self.__mpl_circuit_visualization_list)
      num_figures = max(1, ceil(total_gates / max_gates))  # Ensure at least one figure is created (ex. 42 gates gives 42/20=3 figures)
 
