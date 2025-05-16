@@ -8,6 +8,7 @@ example.c_zero_one(control=0,target=1)
 
 example.draw()
 
+'''
 #OUTPUT:  
 
 #  Q0   --------------------O-----
@@ -17,3 +18,6 @@ example.draw()
 #             +-----+    +-----+  
 #                               
 #  Q2   --------------------------
+'''
+
+
