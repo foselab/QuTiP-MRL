@@ -16,6 +16,7 @@ example.c_custom_gate(gate=user_matrix,control=2,target=0,name='EX.')
 
 example.draw()
 
+'''
 #OUTPUT:  
 
 #                        +-----+  
@@ -26,3 +27,6 @@ example.draw()
 #             +-----+       |     
 #                           |     
 #  Q2   --------------------O-----
+'''
+
+
