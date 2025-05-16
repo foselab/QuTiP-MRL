@@ -2,7 +2,7 @@ from qudit_circuit import QuditCircuit
 
 example = QuditCircuit(num_qudit=3) 
 
-example.plus1(target=1)
+example.plus1(target=1) # The 'plus1' qutrit gate is already in the library and there is no need for the user manual insertion of the matrix
 
 example.c_zero_one(control=0,target=1)
 
