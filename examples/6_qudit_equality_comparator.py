@@ -1,5 +1,42 @@
 equality = QuditCircuit(3,4) # Circuit with 3 qudit of basis 4
 
+# The circuit requires the manual insertion of following matrices 
+
+zero_three_one = np.array([
+    [0, 1, 0, 0],
+    [0, 0, 0, 1],
+    [0, 0, 1, 0],
+    [1, 0, 0, 0]
+])
+
+zero_three_two = np.array([
+    [0, 0, 1, 0],
+    [0, 1, 0, 0],
+    [0, 0, 0, 1],
+    [1, 0, 0, 0]
+])
+
+one_three_two = np.array([
+    [1, 0, 0, 0],
+    [0, 0, 1, 0],
+    [0, 0, 0, 1],
+    [0, 1, 0, 0]
+])
+
+zero_two_three_one = np.array([
+    [0, 1, 0, 0],
+    [0, 0, 0, 1],
+    [1, 0, 0, 0],
+    [0, 0, 1, 0]
+])
+
+plus3 = np.array([
+    [0, 0, 0, 1],
+    [0, 0, 1, 0],
+    [0, 1, 0, 0],
+    [1, 0, 0, 0]
+])
+
 # Q0 and Q1 are input states, they are both in state 0
 # The Equality Comparator will set Q2 to state 3 if input are in the same state, 0 otherwise
 
