@@ -32,8 +32,66 @@ example.custom_gate(gate=m1,target=2,name='M 1')
 
 example.draw()
 
+'''
+OUTPUT:
+                      +-----+                        
+Q0   -----------------| M 2 |------------------------
+                      +-----+                        
+                                 +-----+             
+Q1   ----------------------------| M 4 |-------------
+                                 +-----+             
+           +-----+                  |       +-----+  
+Q2   ------| M 3 |------------------O-------| M 1 |--
+           +-----+                          +-----+  
+'''
+
 example.simulate_einsum()
 
+'''
+OUTPUT:
+
+QUDIT 0 state probabilities:
+  0
+  0
+  1
+  0
+QUDIT 1 state probabilities:
+  0
+  0
+  0
+  1
+QUDIT 2 state probabilities:
+  0
+  0
+  1
+  0
+'''
 
 example.simulate_fullmatrix()
+
+'''
+OUTPUT:
+
+QUDIT 0 Density Matrix:
+Quantum object: dims=[[4], [4]], shape=(4, 4), type='oper', dtype=Dense, isherm=True
+Qobj data =
+[[0. 0. 0. 0.]
+ [0. 0. 0. 0.]
+ [0. 0. 1. 0.]
+ [0. 0. 0. 0.]]
+QUDIT 1 Density Matrix:
+Quantum object: dims=[[4], [4]], shape=(4, 4), type='oper', dtype=Dense, isherm=True
+Qobj data =
+[[0. 0. 0. 0.]
+ [0. 0. 0. 0.]
+ [0. 0. 0. 0.]
+ [0. 0. 0. 1.]]
+QUDIT 2 Density Matrix:
+Quantum object: dims=[[4], [4]], shape=(4, 4), type='oper', dtype=Dense, isherm=True
+Qobj data =
+[[0. 0. 0. 0.]
+ [0. 0. 0. 0.]
+ [0. 0. 1. 0.]
+ [0. 0. 0. 0.]]
+'''
 
