@@ -9,9 +9,29 @@ import ascii_visualization
 
 class QuditCircuit:
 
+    """
+    Core of the library, a class to create and manage a quantum circuit composed of qudits with any number of basis states.
+
+    Each qudit can have an arbitrary number of basis states (default is 3, qutrits).
+    The circuit supports adding qutrit gates using built-in matrices or any qudit gate providing a numpy.array matrix.
+    It also supports einsum and full matrix simulation and offers ASCII and matplotlib-based visualizations.
+
+    Attributes:
+        num_qudit (int): Number of qudits in the circuit.
+        num_states (int): Number of basis states per qudit (default: 3).
+    """
+
     def __init__(self, num_qudit: int, num_states: int=3):
+    """
+    Initialize a QuditCircuit with the given number of qudits and basis states.
+
+    Args:
+        num_qudit (int): Number of qudits in the circuit.
+        num_states (int, optional): Number of basis states per qudit. Default is 3 (qutrits).
+    """    
         self.num_qudit = num_qudit
         self.num_states = num_states
+        # Structures for simulation and visualization
         self.__einsum_gates = []
         self.__fullmatrix_gates = []
         self.__ascii_circuit_visualization_list = []
@@ -19,13 +39,21 @@ class QuditCircuit:
         self.__initial_ASCII_block()
 
     # Functions called by the user to insert a gate in the circuit
-    # These are Qutrit specific gates' construciton functions and they share a common structure
     def id(self, target):
+    """
+    Apply the qutrit identity gate to the specified target qudit.
+
+    Args:
+        target (int): Index of the target qudit.
+
+    Raises:
+        ValueError: If the circuit is configured with more than 3 basis states.
+    """
         if self.num_states> 3: # Warns the user that he is trying to insert qutrit gates in a qudit circuit with basis states greater than 3
-         raise ValueError(f"Trying to insert a Qutrit gate in a >3 states qudit circuit")  
+         raise ValueError(f"Trying to insert a Qutrit gate in a >3-states qudit circuit")  
         # Appends the gate and the target in both the einsum and fullmatrix lists that will be used when circuit is simulated
         self.__einsum_gates.append((Z_I,target))
-        self.__fullmatrix_gates.append((qt.Qobj(Z_I), target)) #Also converts the gate in a QuTiP object
+        self.__fullmatrix_gates.append((qt.Qobj(Z_I), target))
         
         # Code used for the ASCII visual representation,
         self.__simple_gate_ASCII_block(ID_ASCII, target)
@@ -34,6 +62,16 @@ class QuditCircuit:
         self.__mpl_circuit_visualization_list.append(gate_data)   
 
     def plus1(self, target):
+    """
+    Apply the qutrit +1 gate to the specified target qudit.
+    The gate increases the Qutrit state by 1.
+
+    Args:
+        target (int): Index of the target qudit.
+
+    Raises:
+        ValueError: If the circuit is configured with more than 3 basis states.
+    """        
         if self.num_states> 3:
          raise ValueError(f"Trying to insert a Qutrit gate in a >3 states qudit circuit")          
         self.__einsum_gates.append((Z_PLUS_1,target))
@@ -44,6 +82,16 @@ class QuditCircuit:
         self.__mpl_circuit_visualization_list.append(gate_data)          
             
     def plus2(self, target):
+    """
+    Apply the qutrit +2 gate to the specified target qudit.
+    The gate increases the Qutrit state by 2.
+
+    Args:
+        target (int): Index of the target qudit.
+
+    Raises:
+        ValueError: If the circuit is configured with more than 3 basis states.
+    """        
         if self.num_states> 3:
          raise ValueError(f"Trying to insert a Qutrit gate in a >3 states qudit circuit")      
         self.__einsum_gates.append((Z_PLUS_2,target))
@@ -54,6 +102,16 @@ class QuditCircuit:
         self.__mpl_circuit_visualization_list.append(gate_data)
         
     def one_two(self, target):
+    """
+    Apply the qutrit 12 gate to the specified target qudit.
+    The gate exchanges the Qutrit states 1 and 2 (1->2,2->1), if The qutrit is in state 0 it does nothing.
+
+    Args:
+        target (int): Index of the target qudit.
+
+    Raises:
+        ValueError: If the circuit is configured with more than 3 basis states.
+    """            
         if self.num_states> 3:
          raise ValueError(f"Trying to insert a Qutrit gate in a >3 states qudit circuit")          
         self.__einsum_gates.append((Z_12,target))
@@ -64,6 +122,16 @@ class QuditCircuit:
         self.__mpl_circuit_visualization_list.append(gate_data)  
 
     def zero_one(self, target):
+    """
+    Apply the qutrit 01 gate to the specified target qudit.
+    The gate exchanges the Qutrit states 0 and 1 (0->1,1->0), if The qutrit is in state 2 it does nothing.
+
+    Args:
+        target (int): Index of the target qudit.
+
+    Raises:
+        ValueError: If the circuit is configured with more than 3 basis states.
+    """           
         if self.num_states> 3:
          raise ValueError(f"Trying to insert a Qutrit gate in a >3 states qudit circuit")              
         self.__einsum_gates.append((Z_01,target))
@@ -74,6 +142,16 @@ class QuditCircuit:
         self.__mpl_circuit_visualization_list.append(gate_data)  
 
     def zero_two(self, target):
+    """
+    Apply the qutrit 02 gate to the specified target qudit.
+    The gate exchanges the Qutrit states 0 and 2 (0->2,2->0), if The qutrit is in state 1 it does nothing.
+
+    Args:
+        target (int): Index of the target qudit.
+
+    Raises:
+        ValueError: If the circuit is configured with more than 3 basis states.
+    """            
         if self.num_states> 3:
          raise ValueError(f"Trying to insert a Qutrit gate in a >3 states qudit circuit")              
         self.__einsum_gates.append((Z_02,target))
@@ -84,6 +162,17 @@ class QuditCircuit:
         self.__mpl_circuit_visualization_list.append(gate_data)  
         
     def c_plus1(self, control, target):
+    """
+    If the control is in state |2⟩ apply qutrit gate (+1) to the target qudit.
+
+    Args:
+        control (int): Index of the control qudit.
+        target (int): Index of the target qudit.
+
+    Raises:
+        ValueError: If the circuit is configured with more than 3 basis states.
+    """    
+        
         if self.num_states> 3:
          raise ValueError(f"Trying to insert a Qutrit gate in a >3 states qudit circuit")              
         self.__einsum_gates.append((Z_PLUS_1,control,target))
@@ -142,7 +231,7 @@ class QuditCircuit:
        
     # General Qudit gate construction functions (user inserts the matrices)       
     def custom_gate(self, gate, target, name: str = 'CUST'):
-        if len(name) > 4: # Checks that gate's name can fit in the gate visual representation, allows a maximum of 4 character's names
+        if len(name) > 4: # Ensure the gate name fits in ASCII visualization (max 4 characters)
          raise ValueError(f"Name of the gate must be of max 4 chars")  
             
         self.__einsum_gates.append((gate,target))
