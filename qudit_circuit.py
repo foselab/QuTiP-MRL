@@ -19,6 +19,10 @@ class QuditCircuit:
     Attributes:
         num_qudit (int): Number of qudits in the circuit.
         num_states (int): Number of basis states per qudit (default: 3).
+
+    Example:
+        qc = QuditCircuit(6)           # Creates a circuit with 6 QUTRIT
+        qc = QuditCircuit(5,4)         # Creates a circuit with 5 QUDITS, each having 4 basis states
     """
 
     def __init__(self, num_qudit: int, num_states: int=3):
@@ -377,8 +381,9 @@ class QuditCircuit:
 
      Output:
      Prints the state probabilities of each qudit after circuit execution, based on the reduced probabilities.
-     """        
-     qudit_states = []
+     """  
+
+     qudit_states = [] # Created to later print the results
     
      state = np.zeros([self.num_states] * self.num_qudit, dtype="complex64") # Prepares initial state with all qudit in |0⟩ state
      state[(0,) * self.num_qudit] = 1.0
@@ -388,7 +393,8 @@ class QuditCircuit:
             op_matrix, target_index = gate
         elif len(gate) == 3:
             op_matrix, control_index, target_index = gate
-            # Retrive the state of the control qudit
+            
+            # Retrives the state of the control qudit
             axes = tuple(j for j in range(self.num_qudit) if j != control_index)
             control_state = np.sum(np.abs(state)**2, axis=axes)
             # If is not in the state |self.num_states-1⟩ it exits the for
@@ -409,7 +415,7 @@ class QuditCircuit:
         reduced = np.sum(np.abs(state)**2, axis=axes)
         qudit_states.append(reduced)
         
-     for i, q in enumerate(qudit_states): # Prints the qudits states
+     for i, q in enumerate(qudit_states): # Prints the qudits states 
         print(f"QUDIT {i} state probabilities:")
         for values in q:
          print(f"  {values:.0f}")
@@ -418,8 +424,8 @@ class QuditCircuit:
     def draw(self,mode='ascii'):
         """
         Draws the quantum circuit. 
-        The ascii version is shown all in a orizontal scrollable circuit
-        The Matplotlib is shown in segments one under the other in groups of 20 gates
+        The ascii version is shown all in a orizontal scrollable circuit.
+        The Matplotlib is shown in segments one under the other in groups of 20 gates.
 
         Parameters:
         mode (str): 'ascii' (default) Renders the circuit using plain text.
@@ -432,13 +438,12 @@ class QuditCircuit:
         if mode=='mpl':
             self.__mpl_draw()
         else:
-            
             for lines in zip(*self.__ascii_circuit_visualization_list):
              print("".join(lines))        
         
-    # Functions used by the Class to create the graphic ASCII circuit
+    # Private functions used by the Class to create the graphic ASCII circuit
     
-    def __initial_ASCII_block(self): # Used to start the visual representation and print each qudit of the circuit
+    def __initial_ASCII_block(self): # Used to start the visual representation and print each qudit of the circuit and the initial circuit lines
         block = []
         for i in range(self.num_qudit):
             if i>=10:
@@ -447,7 +452,7 @@ class QuditCircuit:
               block.extend(["         ", "Q" + str(i) + "   ----", "         "])    
         self.__ascii_circuit_visualization_list.append(block)
         
-    def __simple_gate_ASCII_block(self, GATE_ASCII, target): # Used for the visual representation of simple gates
+    def __simple_gate_ASCII_block(self, GATE_ASCII, target): # Used for the visual representation of single qudit gates
         block = []
         for _ in range(target):
             block.extend(WIRE_ASCII) # Empty wires on qudits before the target qudit
@@ -460,6 +465,7 @@ class QuditCircuit:
         
     def __controlled_gate_ASCII_block(self, GATE_ASCII, control, target): # Used for the visual representation of a controlled gate
         block = []
+        
         if target > control: # Based on the position of the target and the control we have 2 different codes
             for _ in range(control):
                 block.extend(WIRE_ASCII) # Empty wires before the control
@@ -472,6 +478,7 @@ class QuditCircuit:
             for _ in range(self.num_qudit - target - 1):
                 block.extend(WIRE_ASCII)
             self.__ascii_circuit_visualization_list.append(block)
+            
         else: # Mirrored version of the previous 'if'
             for _ in range(target):
                 block.extend(WIRE_ASCII)
@@ -485,14 +492,13 @@ class QuditCircuit:
                 block.extend(WIRE_ASCII)
             self.__ascii_circuit_visualization_list.append(block)
             
-    def __barrier_ASCII_block(self):
+    def __barrier_ASCII_block(self): # Barrier lines
         block = []
-        for _ in range(self.num_qudit): # Barrier lines
+        for _ in range(self.num_qudit): 
             block.extend(BARRIER_ASCII)
         self.__ascii_circuit_visualization_list.append(block)
                 
             
-
     # Function used by the Class to create the graphic Matplotlib circuit
            
     def __mpl_draw(self, max_gates=20): # Splits the drawing after 20 gates
@@ -500,12 +506,12 @@ class QuditCircuit:
      num_figures = max(1, ceil(total_gates / max_gates))  # Ensure at least one figure is created (ex. 42 gates gives 42/20=3 figures)
 
      for index in range(num_figures): # Creates one figure per time
-        start_gate = index * max_gates # Gates interval
+        start_gate = index * max_gates # Gates printing interval
         end_gate = start_gate + max_gates 
 
         fig, ax = plt.subplots(figsize=(1.5 * max_gates, self.num_qudit)) # Creates figure with dimensions related to the number of qudits and the max_gate value 
 
-        # Axes set up and removes borders
+        # Axes set up and borders removal
         ax.set_xlim(-0.5, max_gates - 0.5)
         ax.set_ylim(self.num_qudit - 0.5, -0.5)
         for spine in ax.spines.values():
@@ -561,50 +567,52 @@ class QuditCircuit:
             plt.title(f"Circuit Segment {index + 1}", fontsize=18)
             plt.show()
         
-    # Funcion called by simulate_fullmatrix() when a single qudit gate act on the circuit
+    # Private funcion called by simulate_fullmatrix() when a single qudit gate acts on the circuit
     
     def __single_qudit_gate(self, GATE, target):
         """
+        Builds a single_qudit_gate operator,
+
         :param GATE: Matrix of a gate in qt.obj form
         :param target: Index of target qudit
         :return: Tensor product of all qudits
         """
-        # I build operator doing tensor product beetween GATE on target qudit and identities on other qudits
+        # Builds operator doing a tensor product beetween GATE on target qudit and identities on other qudits
         operator_list = [qt.Qobj(np.eye(self.num_states, dtype=complex)) for _ in range(self.num_qudit)]
         operator_list[target] = GATE
         return qt.tensor(*operator_list)
          
         
-    # Funcion called by simulate_fullmatrix() when a controlled gate act on the circuit
+    # Private funcion called by simulate_fullmatrix() when a controlled gate acts on the circuit
     
     def __controlled_qudit_gate(self, GATE, control, target):
       """
-      Builds ms_gate, 'GATE' is applied on target if control is in state 2 otherwise identity is applied
+      Builds a controlled_qudit_gate operator, 'GATE' is applied on target if control is in num_states-1⟩ state, otherwise identity is applied
 
       :param GATE: Matrix of a gate in qt.obj form
       :param control: Index of control qudit
       :param target: Index of target qudit
       :return: Tensor product of all qudits
       """
-      # We define the projectors for control qudit
+      # Defines the projectors for control qudit
       projectors = [qt.basis(self.num_states, i) * qt.basis(self.num_states, i).dag() for i in range(self.num_states)]
 
-      # We will build 'num_states' terms, one for each ptojector
+      # It will build 'num_states' terms, one for each ptojector
       terms = []
       for i, P in enumerate(projectors):
-          target_op = GATE if i == self.num_states - 1 else np.eye(self.num_states, dtype=complex)
+          target_op = GATE if i == self.num_states - 1 else np.eye(self.num_states, dtype=complex) # target_op is GATE when control is in num_states-1⟩ state, otherwise is an identity matrix
           op_list = []
           for i in range(self.num_qudit):
               if i == control:
                   # If qudit is the control we insert the projectors
                   op_list.append(P)
               elif i == target:
-                  # If qudit is the target we insert target_op, that will be 'GATE', when control is in state 2 otherwise it wil be Z_I
+                  # If qudit is the target we insert target_op 
                   op_list.append(qt.Qobj(target_op))
               else:
                   # We insert identities when the qudit is neither a control or a target
                   op_list.append(qt.Qobj(np.eye(self.num_states, dtype=complex)))
-          # In each term we will put the tensor product of op_list, 'num_states' projectors means 'num_states' op_list
+          # In each term we will put the tensor product of op_list. 
           terms.append(qt.tensor(*op_list))
 
       # The total operator is the sum of the 'num_states' built terms (this will be a num_states^num_qutrits x num_states^num_qutrits matrix representing the operations on all qudits)
