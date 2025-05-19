@@ -4,7 +4,7 @@ import numpy as np
 import qutip as qt
 
 import qutrit_matrices
-import ascii_visualization
+import ascii_gates
 
 
 class QuditCircuit:
