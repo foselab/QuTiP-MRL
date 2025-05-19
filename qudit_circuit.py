@@ -163,7 +163,7 @@ class QuditCircuit:
         
     def c_plus1(self, control, target):
     """
-    If the control is in state |2⟩ apply qutrit gate (+1) to the target qudit.
+    If the control is in state |2⟩ apply qutrit gate +1 to the target qudit.
 
     Args:
         control (int): Index of the control qudit.
@@ -183,6 +183,16 @@ class QuditCircuit:
         self.__mpl_circuit_visualization_list.append(gate_data)   
         
     def c_plus2(self, control, target):
+    """
+    If the control is in state |2⟩ apply qutrit gate +2 to the target qudit.
+
+    Args:
+        control (int): Index of the control qudit.
+        target (int): Index of the target qudit.
+
+    Raises:
+        ValueError: If the circuit is configured with more than 3 basis states.
+    """            
         if self.num_states> 3:
          raise ValueError(f"Trying to insert a Qutrit gate in a >3 states qudit circuit")              
         self.__einsum_gates.append((Z_PLUS_2,control,target))
@@ -193,6 +203,16 @@ class QuditCircuit:
         self.__mpl_circuit_visualization_list.append(gate_data)          
 
     def c_one_two(self, control, target):
+      """
+    If the control is in state |2⟩ apply qutrit gate 12 to the target qudit.
+
+    Args:
+        control (int): Index of the control qudit.
+        target (int): Index of the target qudit.
+
+    Raises:
+        ValueError: If the circuit is configured with more than 3 basis states.
+    """          
         if self.num_states> 3:
          raise ValueError(f"Trying to insert a Qutrit gate in a >3 states qudit circuit")              
         self.__einsum_gates.append((Z_12,control,target))
@@ -203,6 +223,16 @@ class QuditCircuit:
         self.__mpl_circuit_visualization_list.append(gate_data)   
 
     def c_zero_one(self, control, target):
+    """
+    If the control is in state |2⟩ apply qutrit gate 01 to the target qudit.
+
+    Args:
+        control (int): Index of the control qudit.
+        target (int): Index of the target qudit.
+
+    Raises:
+        ValueError: If the circuit is configured with more than 3 basis states.
+    """           
         if self.num_states> 3:
          raise ValueError(f"Trying to insert a Qutrit gate in a >3 states qudit circuit")              
         self.__einsum_gates.append((Z_01,control,target))
@@ -213,6 +243,16 @@ class QuditCircuit:
         self.__mpl_circuit_visualization_list.append(gate_data)   
 
     def c_zero_two(self, control, target):
+    """
+    If the control is in state |2⟩ apply qutrit gate 02 to the target qudit.
+
+    Args:
+        control (int): Index of the control qudit.
+        target (int): Index of the target qudit.
+
+    Raises:
+        ValueError: If the circuit is configured with more than 3 basis states.
+    """         
         if self.num_states> 3:
          raise ValueError(f"Trying to insert a Qutrit gate in a >3 states qudit circuit")         
         self.__einsum_gates.append((Z_02,control,target))
@@ -222,14 +262,15 @@ class QuditCircuit:
         gate_data = {'name': '02', 'control': control, 'target': target, 'color': '#f4a261', 'column': len(self.__mpl_circuit_visualization_list)}
         self.__mpl_circuit_visualization_list.append(gate_data) 
         
-    # Barrier used only for graphical purpose, can be inserted by the user in any point of the circuit    
+    # Barrier used only for graphical purposes, can be inserted by the user in any point of the circuit    
     def barrier(self):
         self.__barrier_ASCII_block()
         barrier_data = {'name': 'barrier', 'column': len(self.__mpl_circuit_visualization_list)}
         self.__mpl_circuit_visualization_list.append(barrier_data)
             
        
-    # General Qudit gate construction functions (user inserts the matrices)       
+    # Following two functions are for general Qudit gate construction (user manually inserts the matrices).
+    # These are ment for circuit with more than 3 basis states.
     def custom_gate(self, gate, target, name: str = 'CUST'):
         if len(name) > 4: # Ensure the gate name fits in ASCII visualization (max 4 characters)
          raise ValueError(f"Name of the gate must be of max 4 chars")  
