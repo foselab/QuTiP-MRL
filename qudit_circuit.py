@@ -270,8 +270,20 @@ class QuditCircuit:
             
        
     # Following two functions are for general Qudit gate construction (user manually inserts the matrices).
-    # These are ment for circuit with more than 3 basis states.
+    # These are meant for circuit with more than 3 basis states.
     def custom_gate(self, gate, target, name: str = 'CUST'):
+    """
+    Apply a custom single-qudit gate. 
+    gate must be a matrix in the form of numpy.array.
+
+    Args:
+        gate (np.ndarray): Unitary matrix representing the gate.
+        target (int): Index of the target qudit.
+        name (str): Gate label (max 4 characters) for visualization.
+
+    Raises:
+        ValueError: If name exceeds 4 characters.
+    """
         if len(name) > 4: # Ensure the gate name fits in ASCII visualization (max 4 characters)
          raise ValueError(f"Name of the gate must be of max 4 chars")  
             
@@ -283,6 +295,21 @@ class QuditCircuit:
         self.__mpl_circuit_visualization_list.append(gate_data)           
         
     def c_custom_gate(self, gate, control, target, name: str = 'CUST'):
+    """
+    Apply a custom controlled qudit gate.
+
+    The gate is applied to the target qudit only when the control qudit is in the |d−1⟩ state (with d being the basis states of the circuit).
+    gate must be a matrix in the form of numpy.array.
+
+    Args:
+        gate (np.ndarray): Unitary matrix representing the gate.
+        control (int): Index of the control qudit.
+        target (int): Index of the target qudit.
+        name (str): Gate label (max 4 characters) for visualization.
+
+    Raises:
+        ValueError: If name exceeds 4 characters.
+    """ 
         if len(name) > 4:
          raise ValueError(f"Name of the gate must be of max 4 chars")
          
@@ -291,8 +318,11 @@ class QuditCircuit:
         
         self.__controlled_gate_ASCII_block(custom_ascii(name), control, target)
         gate_data = {'name': name, 'control': control, 'target': target, 'color': '#603F83', 'column': len(self.__mpl_circuit_visualization_list)}
-        self.__mpl_circuit_visualization_list.append(gate_data)           
-        
+        self.__mpl_circuit_visualization_list.append(gate_data)
+
+
+    # Following two functions are for circuit simulation    
+
     def simulate_fullmatrix(self,show_final_state_vector: bool = False):
         """
         Simulates the execution of the quantum circuit using full matrix operations.
@@ -303,8 +333,11 @@ class QuditCircuit:
         Notes:
         The circuit is evolved using matrix multiplication on the full quantum state. 
         As a result, the data size grows rapidly, and simulation becomes computationally expensive.
-        The bigger the number of states is the less qudits can be used in the circuit.
+        The bigger the number of states is and the less qudits can be used in the circuit.
         When using qutrits it is recommended to limit the circuit to a maximum of 8 qutrits while using this simulator.
+
+        Args:
+            show_final_state_vector (bool): If True, prints the full final state vector.
         
         Output:
         Prints the density matrix of each qudit after circuit execution.
@@ -315,7 +348,7 @@ class QuditCircuit:
         final_state=initial_state
 
         for gate in self.__fullmatrix_gates:
-            if len(gate)==2: # If the gate is not controlled calls the __shift_gate function to develop the system state
+            if len(gate)==2: # If the gate is NOT controlled calls the __shift_gate function to develop the system state
              op_matrix, target_index = gate
              final_state = self.__single_qudit_gate(op_matrix,target_index) * final_state 
             else: # If the gate is controlled calls the __ms_gate function to develop the system state
@@ -326,8 +359,8 @@ class QuditCircuit:
          state = final_state.ptrace(i)
          output_list.append(f"QUDIT {i} Density Matrix:\n{state}")
          
-        if show_final_state_vector: print(final_state)
-        print("\n".join(output_list))
+        if show_final_state_vector: print(final_state) # If user flagged the final state the functions also prints the  final_state vector
+        print("\n".join(output_list)) # Prints qudits density matrices
          
     def simulate_einsum(self):
      """
