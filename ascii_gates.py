@@ -1,4 +1,4 @@
-# Constants used when drawing gates
+# Constants used when drawing gates in ascii visualization
 PLUS2_ASCII =       ["  +----+  ",
                      "--| +2 |--",
                      "  +----+  "]
