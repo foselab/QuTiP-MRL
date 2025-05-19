@@ -561,7 +561,7 @@ class QuditCircuit:
             plt.title(f"Circuit Segment {index + 1}", fontsize=18)
             plt.show()
         
-    # Funcion called by when a single qudit gate act on the circuit
+    # Funcion called by simulate_fullmatrix() when a single qudit gate act on the circuit
     
     def __single_qudit_gate(self, GATE, target):
         """
@@ -575,7 +575,7 @@ class QuditCircuit:
         return qt.tensor(*operator_list)
          
         
-    # Funcion called by when a controlled gate act on the circuit
+    # Funcion called by simulate_fullmatrix() when a controlled gate act on the circuit
     
     def __controlled_qudit_gate(self, GATE, control, target):
       """
