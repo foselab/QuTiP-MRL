@@ -1,3 +1,5 @@
+from qudit_circuit import QuditCircuit
+
 equality = QuditCircuit(3,4) # Circuit with 3 qudit of basis 4
 
 # The circuit requires the manual insertion of following matrices 
