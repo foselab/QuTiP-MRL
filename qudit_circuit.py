@@ -345,27 +345,49 @@ class QuditCircuit:
         
         Output:
         Prints the density matrix of each qudit after circuit execution.
+        Prints the final measurement probabilities
+        Prints the Final State Vector if show_final_state_vector is flagged to 'True'
         """
         output_list=[]
-
+        
         initial_state = qt.tensor([qt.basis(self.num_states, 0)] * self.num_qudit) # Prepares initial state with all qudits in |0⟩ state
-        final_state=initial_state
+        final_state = qt.Qobj(initial_state.full(), dims=[[self.num_states ** self.num_qudit], [1]]) # Converts dimensions to be able to work with operators
 
         for gate in self.__fullmatrix_gates:
-            if len(gate)==2: # If the gate is NOT controlled calls the __shift_gate function to develop the system state
+            if len(gate)==2: # If the gate is NOT controlled calls the __shift_gate function to develop the system state, it will return the operator to apply to the state
              op_matrix, target_index = gate
-             final_state = self.__single_qudit_gate(op_matrix,target_index) * final_state 
-            else: # If the gate is controlled calls the __ms_gate function to develop the system state
+             full_op = self.__single_qudit_gate(op_matrix, target_index)
+            else: # If the gate is controlled calls the __ms_gate function to develop the system state, it will return the operator to apply to the state
              op_matrix, control_index, target_index = gate
-             final_state = self.__controlled_qudit_gate(op_matrix,control_index,target_index) * final_state
-         
+             full_op = self.__controlled_qudit_gate(op_matrix, control_index, target_index)
+            # Applies the returned operator to the final state evolving it
+            final_state = full_op * final_state   
+
+        # SECTION TO PRINT QUDIT DENSITY MATRICES
         for i in range(self.num_qudit): # From the final state it retrieves the (num_states x num_states) matrix of each qudit and prints it
-         state = final_state.ptrace(i)
-         output_list.append(f"QUDIT {i} Density Matrix:\n{state}")
+         state = final_state_tensor.ptrace(i)
+         matrix = state.full()
+         matrix[np.abs(matrix) < 1e-15] = 0  # In the density matrix sets to 0 small values for more clarity 
+         output_list.append(f"QUDIT {i} Density Matrix:\n{matrix}") 
+        print("\n".join(output_list))
+        
+        # SECTION TO PRINT FINAL MEASUMENTS PROBABILITIES 
+        probs = np.abs(final_state_tensor.full().flatten())**2 # Gives the measurement probability distribution in the computational basis
+        threshold = 1e-5  # Will ignore states under this probability
+        print("\nFinal measurement probabilities:\n")
+        for i, p in enumerate(probs):
+          if p > threshold:
+           basis_state = self.__index_to_basis_string(i) # Calls the __index_to_basis_string
+           print(f"|{basis_state}⟩: {p*100:.2f}%")
+              
+        # SECTION TO PRINT FINAL MEASUMENTS PROBABILITIES 
+        if show_final_state_vector: # If user flagged the final state the functions also prints the  final_state vector
+         print("\nFinal State Vector:\n", final_state)
          
-        if show_final_state_vector: print(final_state) # If user flagged the final state the functions also prints the  final_state vector
-        print("\n".join(output_list)) # Prints qudits density matrices
-         
+        
+    def __index_to_basis_string(self,index):
+     return ''.join(str(x) for x in np.base_repr(index, self.num_states).zfill(self.num_qudit)) 
+        
     def simulate_einsum(self):
      """
      Simulates the execution of the quantum circuit using Einstein summation (einsum).
@@ -580,7 +602,9 @@ class QuditCircuit:
         # Builds operator doing a tensor product beetween GATE on target qudit and identities on other qudits
         operator_list = [qt.Qobj(np.eye(self.num_states, dtype=complex)) for _ in range(self.num_qudit)]
         operator_list[target] = GATE
-        return qt.tensor(*operator_list)
+        operator = qt.tensor(*operator_list)
+        # Coverts operator dimensions
+        return qt.Qobj(operator.full(), dims=[[self.num_states ** self.num_qudit], [self.num_states ** self.num_qudit]])
          
         
     # Private funcion called by simulate_fullmatrix() when a controlled gate acts on the circuit
@@ -594,26 +618,31 @@ class QuditCircuit:
       :param target: Index of target qudit
       :return: Tensor product of all qudits
       """
-      # Defines the projectors for control qudit
-      projectors = [qt.basis(self.num_states, i) * qt.basis(self.num_states, i).dag() for i in range(self.num_states)]
+      # Pass inputs for code clarity purposes
+      d = self.num_states
+      n = self.num_qudit 
 
-      # It will build 'num_states' terms, one for each ptojector
-      terms = []
-      for i, P in enumerate(projectors):
-          target_op = GATE if i == self.num_states - 1 else np.eye(self.num_states, dtype=complex) # target_op is GATE when control is in num_states-1⟩ state, otherwise is an identity matrix
-          op_list = []
-          for i in range(self.num_qudit):
-              if i == control:
-                  # If qudit is the control we insert the projectors
-                  op_list.append(P)
-              elif i == target:
-                  # If qudit is the target we insert target_op 
-                  op_list.append(qt.Qobj(target_op))
-              else:
-                  # We insert identities when the qudit is neither a control or a target
-                  op_list.append(qt.Qobj(np.eye(self.num_states, dtype=complex)))
-          # In each term we will put the tensor product of op_list. 
-          terms.append(qt.tensor(*op_list))
+      # Defines the projector on |d-1><d-1| for control qudit, isolates the d-1 component of the qudit
+      P = qt.basis(d, d - 1) * qt.basis(d, d - 1).dag()
 
-      # The total operator is the sum of the 'num_states' built terms (this will be a num_states^num_qutrits x num_states^num_qutrits matrix representing the operations on all qudits)
-      return sum(terms)
+      # (GATE - I), to apply only when control is in |d-1>
+      target_gate_delta = GATE - qt.qeye(d)
+
+      # Builds a list of identities with the projector inserted at the control qudit position
+      op_list_P = [qt.qeye(d) for _ in range(n)]
+      op_list_P[control] = P # On control we apply projector
+      P_full = qt.tensor(op_list_P)
+
+      # Operator that extends the target_gate_delta to the all system  
+      op_list_T = [qt.qeye(d) for _ in range(n)]
+      op_list_T[target] = target_gate_delta # On target we apply delta_gate
+      T_full = qt.tensor(op_list_T)
+
+      # Modify operators dimensions 
+      flat_dims = [[d ** n], [d ** n]]
+      P_full.dims = flat_dims
+      T_full.dims = flat_dims
+
+      # Final operator, will give I on target when control is not in d-1 state, or GATE when control is in d-1 state
+      full_operator = qt.qeye(d ** n) + P_full * T_full
+      return full_operator
