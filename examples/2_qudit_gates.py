@@ -1,4 +1,4 @@
-from qudit_circuit import QuditCircuit
+from qutip_mrl.qudit_circuit import QuditCircuit
 import numpy as np
 
 example = QuditCircuit(num_qudit=3,num_states=4)

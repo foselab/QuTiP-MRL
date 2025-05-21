@@ -1,4 +1,4 @@
-from qudit_circuit import QuditCircuit
+from qutip_mrl.qudit_circuit import QuditCircuit
 
 full_adder = QuditCircuit(4) # Circuit initialization, 4 qutrits
 
@@ -69,3 +69,5 @@ QUDIT 3 state probabilities:
   1
   0
 '''
+
+full_adder.simulate_fullmatrix()

@@ -1,4 +1,5 @@
-from qudit_circuit import QuditCircuit
+from qutip_mrl.qudit_circuit import QuditCircuit
+import numpy as np
 
 equality = QuditCircuit(3,4) # Circuit with 3 qudit of basis 4
 

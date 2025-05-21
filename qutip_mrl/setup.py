@@ -9,8 +9,8 @@ setup(
         "matplotlib",
         "qutip"
     ],
-    author="fabiopievani",
-    description="Qudit circuit simulator",
+    author="FOSELAB@UniBG",
+    description="QuTiP-MRL - Qudit circuit simulator",
     classifiers=[
         "Programming Language :: Python :: 3"
     ],

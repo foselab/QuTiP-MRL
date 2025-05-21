@@ -1,4 +1,4 @@
-from qudit_circuit import QuditCircuit
+from qutip_mrl.qudit_circuit import QuditCircuit
 
 example = QuditCircuit(num_qudit=3) 
 

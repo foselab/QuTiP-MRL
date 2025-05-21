@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import qutip as qt
 
-import qutrit_matrices
-import ascii_gates
+import qutip_mrl.qutrit_matrices as qutrit_matrices
+import qutip_mrl.ascii_gates as ascii_gates
 
 
 class QuditCircuit:
@@ -26,13 +26,13 @@ class QuditCircuit:
     """
 
     def __init__(self, num_qudit: int, num_states: int=3):
-    """
-    Initialize a QuditCircuit with the given number of qudits and basis states.
+        """
+        Initialize a QuditCircuit with the given number of qudits and basis states.
 
-    Args:
-        num_qudit (int): Number of qudits in the circuit.
-        num_states (int, optional): Number of basis states per qudit. Default is 3 (qutrits).
-    """    
+        Args:
+            num_qudit (int): Number of qudits in the circuit.
+            num_states (int, optional): Number of basis states per qudit. Default is 3 (qutrits).
+        """    
         self.num_qudit = num_qudit
         self.num_states = num_states
         # Structures for simulation and visualization
@@ -44,224 +44,224 @@ class QuditCircuit:
 
     # Functions called by the user to insert a gate in the circuit
     def id(self, target):
-    """
-    Apply the qutrit identity gate to the specified target qudit.
+        """
+        Apply the qutrit identity gate to the specified target qudit.
 
-    Args:
-        target (int): Index of the target qudit.
+        Args:
+            target (int): Index of the target qudit.
 
-    Raises:
-        ValueError: If the circuit is configured with more than 3 basis states.
-    """
+        Raises:
+            ValueError: If the circuit is configured with more than 3 basis states.
+        """
         if self.num_states> 3: # Warns the user that he is trying to insert qutrit gates in a qudit circuit with basis states greater than 3
          raise ValueError(f"Trying to insert a Qutrit gate in a >3-states qudit circuit")  
         # Appends the gate and the target in both the einsum and fullmatrix lists that will be used when circuit is simulated
-        self.__einsum_gates.append((Z_I,target))
-        self.__fullmatrix_gates.append((qt.Qobj(Z_I), target))
+        self.__einsum_gates.append((qutrit_matrices.Z_I,target))
+        self.__fullmatrix_gates.append((qt.Qobj(qutrit_matrices.Z_I), target))
         
         # Code used for the ASCII visual representation,
-        self.__simple_gate_ASCII_block(ID_ASCII, target)
+        self.__simple_gate_ASCII_block(ascii_gates.ID_ASCII, target)
         # Code used for the Matplotlib visual representation, generates the gate's info and adds them in a list
         gate_data = {'name': 'I', 'target': target, 'color': 'lightblue', 'column': len(self.__mpl_circuit_visualization_list)}
         self.__mpl_circuit_visualization_list.append(gate_data)   
 
     def plus1(self, target):
-    """
-    Apply the qutrit +1 gate to the specified target qudit.
-    The gate increases the Qutrit state by 1.
+        """
+        Apply the qutrit +1 gate to the specified target qudit.
+        The gate increases the Qutrit state by 1.
 
-    Args:
-        target (int): Index of the target qudit.
+        Args:
+            target (int): Index of the target qudit.
 
-    Raises:
-        ValueError: If the circuit is configured with more than 3 basis states.
-    """        
+        Raises:
+            ValueError: If the circuit is configured with more than 3 basis states.
+        """        
         if self.num_states> 3:
          raise ValueError(f"Trying to insert a Qutrit gate in a >3 states qudit circuit")          
-        self.__einsum_gates.append((Z_PLUS_1,target))
-        self.__fullmatrix_gates.append((qt.Qobj(Z_PLUS_1), target))
+        self.__einsum_gates.append((qutrit_matrices.Z_PLUS_1,target))
+        self.__fullmatrix_gates.append((qt.Qobj(qutrit_matrices.Z_PLUS_1), target))
         
-        self.__simple_gate_ASCII_block(PLUS1_ASCII, target)
+        self.__simple_gate_ASCII_block(ascii_gates.PLUS1_ASCII, target)
         gate_data = {'name': '+1', 'target': target, 'color': '#2a9d8f', 'column': len(self.__mpl_circuit_visualization_list)}
         self.__mpl_circuit_visualization_list.append(gate_data)          
             
     def plus2(self, target):
-    """
-    Apply the qutrit +2 gate to the specified target qudit.
-    The gate increases the Qutrit state by 2.
+        """
+        Apply the qutrit +2 gate to the specified target qudit.
+        The gate increases the Qutrit state by 2.
 
-    Args:
-        target (int): Index of the target qudit.
+        Args:
+            target (int): Index of the target qudit.
 
-    Raises:
-        ValueError: If the circuit is configured with more than 3 basis states.
-    """        
+        Raises:
+            ValueError: If the circuit is configured with more than 3 basis states.
+        """        
         if self.num_states> 3:
          raise ValueError(f"Trying to insert a Qutrit gate in a >3 states qudit circuit")      
-        self.__einsum_gates.append((Z_PLUS_2,target))
-        self.__fullmatrix_gates.append((qt.Qobj(Z_PLUS_2), target))
+        self.__einsum_gates.append((qutrit_matrices.Z_PLUS_2,target))
+        self.__fullmatrix_gates.append((qt.Qobj(qutrit_matrices.Z_PLUS_2), target))
         
-        self.__simple_gate_ASCII_block(PLUS2_ASCII, target)
+        self.__simple_gate_ASCII_block(ascii_gates.PLUS2_ASCII, target)
         gate_data = {'name': '+2', 'target': target, 'color': '#0081a7', 'column': len(self.__mpl_circuit_visualization_list)}
         self.__mpl_circuit_visualization_list.append(gate_data)
         
     def one_two(self, target):
-    """
-    Apply the qutrit 12 gate to the specified target qudit.
-    The gate exchanges the Qutrit states 1 and 2 (1->2,2->1), if The qutrit is in state 0 it does nothing.
+        """
+        Apply the qutrit 12 gate to the specified target qudit.
+        The gate exchanges the Qutrit states 1 and 2 (1->2,2->1), if The qutrit is in state 0 it does nothing.
 
-    Args:
-        target (int): Index of the target qudit.
+        Args:
+            target (int): Index of the target qudit.
 
-    Raises:
-        ValueError: If the circuit is configured with more than 3 basis states.
-    """            
+        Raises:
+            ValueError: If the circuit is configured with more than 3 basis states.
+        """            
         if self.num_states> 3:
          raise ValueError(f"Trying to insert a Qutrit gate in a >3 states qudit circuit")          
-        self.__einsum_gates.append((Z_12,target))
-        self.__fullmatrix_gates.append((qt.Qobj(Z_12), target))
+        self.__einsum_gates.append((qutrit_matrices.Z_12,target))
+        self.__fullmatrix_gates.append((qt.Qobj(qutrit_matrices.Z_12), target))
         
-        self.__simple_gate_ASCII_block(ONE_TWO_ASCII, target)
+        self.__simple_gate_ASCII_block(ascii_gates.ONE_TWO_ASCII, target)
         gate_data = {'name': '12', 'target': target, 'color': '#e76f51', 'column': len(self.__mpl_circuit_visualization_list)}
         self.__mpl_circuit_visualization_list.append(gate_data)  
 
     def zero_one(self, target):
-    """
-    Apply the qutrit 01 gate to the specified target qudit.
-    The gate exchanges the Qutrit states 0 and 1 (0->1,1->0), if The qutrit is in state 2 it does nothing.
+        """
+        Apply the qutrit 01 gate to the specified target qudit.
+        The gate exchanges the Qutrit states 0 and 1 (0->1,1->0), if The qutrit is in state 2 it does nothing.
 
-    Args:
-        target (int): Index of the target qudit.
+        Args:
+            target (int): Index of the target qudit.
 
-    Raises:
-        ValueError: If the circuit is configured with more than 3 basis states.
-    """           
+        Raises:
+            ValueError: If the circuit is configured with more than 3 basis states.
+        """           
         if self.num_states> 3:
          raise ValueError(f"Trying to insert a Qutrit gate in a >3 states qudit circuit")              
-        self.__einsum_gates.append((Z_01,target))
-        self.__fullmatrix_gates.append((qt.Qobj(Z_01), target))
+        self.__einsum_gates.append((qutrit_matrices.Z_01,target))
+        self.__fullmatrix_gates.append((qt.Qobj(qutrit_matrices.Z_01), target))
         
-        self.__simple_gate_ASCII_block(ZERO_ONE_ASCII, target)
+        self.__simple_gate_ASCII_block(ascii_gates.ZERO_ONE_ASCII, target)
         gate_data = {'name': '01', 'target': target, 'color': '#e9c46a', 'column': len(self.__mpl_circuit_visualization_list)}
         self.__mpl_circuit_visualization_list.append(gate_data)  
 
     def zero_two(self, target):
-    """
-    Apply the qutrit 02 gate to the specified target qudit.
-    The gate exchanges the Qutrit states 0 and 2 (0->2,2->0), if The qutrit is in state 1 it does nothing.
+        """
+        Apply the qutrit 02 gate to the specified target qudit.
+        The gate exchanges the Qutrit states 0 and 2 (0->2,2->0), if The qutrit is in state 1 it does nothing.
 
-    Args:
-        target (int): Index of the target qudit.
+        Args:
+            target (int): Index of the target qudit.
 
-    Raises:
-        ValueError: If the circuit is configured with more than 3 basis states.
-    """            
+        Raises:
+            ValueError: If the circuit is configured with more than 3 basis states.
+        """            
         if self.num_states> 3:
          raise ValueError(f"Trying to insert a Qutrit gate in a >3 states qudit circuit")              
-        self.__einsum_gates.append((Z_02,target))
-        self.__fullmatrix_gates.append((qt.Qobj(Z_02), target))
+        self.__einsum_gates.append((qutrit_matrices.Z_02,target))
+        self.__fullmatrix_gates.append((qt.Qobj(qutrit_matrices.Z_02), target))
         
-        self.__simple_gate_ASCII_block(ZERO_TWO_ASCII, target)
+        self.__simple_gate_ASCII_block(ascii_gates.ZERO_TWO_ASCII, target)
         gate_data = {'name': '02', 'target': target, 'color': '#f4a261', 'column': len(self.__mpl_circuit_visualization_list)}
         self.__mpl_circuit_visualization_list.append(gate_data)  
         
     def c_plus1(self, control, target):
-    """
-    If the control is in state |2⟩ apply qutrit gate +1 to the target qudit.
+        """
+        If the control is in state |2⟩ apply qutrit gate +1 to the target qudit.
 
-    Args:
-        control (int): Index of the control qudit.
-        target (int): Index of the target qudit.
+        Args:
+            control (int): Index of the control qudit.
+            target (int): Index of the target qudit.
 
-    Raises:
-        ValueError: If the circuit is configured with more than 3 basis states.
-    """    
+        Raises:
+            ValueError: If the circuit is configured with more than 3 basis states.
+        """    
         
         if self.num_states> 3:
          raise ValueError(f"Trying to insert a Qutrit gate in a >3 states qudit circuit")              
-        self.__einsum_gates.append((Z_PLUS_1,control,target))
-        self.__fullmatrix_gates.append((qt.Qobj(Z_PLUS_1), control, target))
+        self.__einsum_gates.append((qutrit_matrices.Z_PLUS_1,control,target))
+        self.__fullmatrix_gates.append((qt.Qobj(qutrit_matrices.Z_PLUS_1), control, target))
         
-        self.__controlled_gate_ASCII_block(PLUS1_ASCII, control, target)
+        self.__controlled_gate_ASCII_block(ascii_gates.PLUS1_ASCII, control, target)
         gate_data = {'name': '+1', 'control': control, 'target': target, 'color': '#2a9d8f', 'column': len(self.__mpl_circuit_visualization_list)}
         self.__mpl_circuit_visualization_list.append(gate_data)   
         
     def c_plus2(self, control, target):
-    """
-    If the control is in state |2⟩ apply qutrit gate +2 to the target qudit.
+        """
+        If the control is in state |2⟩ apply qutrit gate +2 to the target qudit.
 
-    Args:
-        control (int): Index of the control qudit.
-        target (int): Index of the target qudit.
+        Args:
+            control (int): Index of the control qudit.
+            target (int): Index of the target qudit.
 
-    Raises:
-        ValueError: If the circuit is configured with more than 3 basis states.
-    """            
+        Raises:
+            ValueError: If the circuit is configured with more than 3 basis states.
+        """            
         if self.num_states> 3:
          raise ValueError(f"Trying to insert a Qutrit gate in a >3 states qudit circuit")              
-        self.__einsum_gates.append((Z_PLUS_2,control,target))
-        self.__fullmatrix_gates.append((qt.Qobj(Z_PLUS_2), control, target))
+        self.__einsum_gates.append((qutrit_matrices.Z_PLUS_2,control,target))
+        self.__fullmatrix_gates.append((qt.Qobj(qutrit_matrices.Z_PLUS_2), control, target))
         
-        self.__controlled_gate_ASCII_block(PLUS2_ASCII, control, target)
+        self.__controlled_gate_ASCII_block(ascii_gates.PLUS2_ASCII, control, target)
         gate_data = {'name': '+2', 'control': control, 'target': target, 'color': '#0081a7', 'column': len(self.__mpl_circuit_visualization_list)}
         self.__mpl_circuit_visualization_list.append(gate_data)          
 
     def c_one_two(self, control, target):
-      """
-    If the control is in state |2⟩ apply qutrit gate 12 to the target qudit.
+        """
+        If the control is in state |2⟩ apply qutrit gate 12 to the target qudit.
 
-    Args:
-        control (int): Index of the control qudit.
-        target (int): Index of the target qudit.
+        Args:
+            control (int): Index of the control qudit.
+            target (int): Index of the target qudit.
 
-    Raises:
-        ValueError: If the circuit is configured with more than 3 basis states.
-    """          
+        Raises:
+            ValueError: If the circuit is configured with more than 3 basis states.
+        """          
         if self.num_states> 3:
          raise ValueError(f"Trying to insert a Qutrit gate in a >3 states qudit circuit")              
-        self.__einsum_gates.append((Z_12,control,target))
-        self.__fullmatrix_gates.append((qt.Qobj(Z_12), control, target))
+        self.__einsum_gates.append((qutrit_matrices.Z_12,control,target))
+        self.__fullmatrix_gates.append((qt.Qobj(qutrit_matrices.Z_12), control, target))
         
-        self.__controlled_gate_ASCII_block(ONE_TWO_ASCII, control, target)
+        self.__controlled_gate_ASCII_block(ascii_gates.ONE_TWO_ASCII, control, target)
         gate_data = {'name': '12', 'control': control, 'target': target, 'color': '#e76f51', 'column': len(self.__mpl_circuit_visualization_list)}
         self.__mpl_circuit_visualization_list.append(gate_data)   
 
     def c_zero_one(self, control, target):
-    """
-    If the control is in state |2⟩ apply qutrit gate 01 to the target qudit.
+        """
+        If the control is in state |2⟩ apply qutrit gate 01 to the target qudit.
 
-    Args:
-        control (int): Index of the control qudit.
-        target (int): Index of the target qudit.
+        Args:
+            control (int): Index of the control qudit.
+            target (int): Index of the target qudit.
 
-    Raises:
-        ValueError: If the circuit is configured with more than 3 basis states.
-    """           
+        Raises:
+            ValueError: If the circuit is configured with more than 3 basis states.
+        """           
         if self.num_states> 3:
          raise ValueError(f"Trying to insert a Qutrit gate in a >3 states qudit circuit")              
-        self.__einsum_gates.append((Z_01,control,target))
-        self.__fullmatrix_gates.append((qt.Qobj(Z_01), control, target))
+        self.__einsum_gates.append((qutrit_matrices.Z_01,control,target))
+        self.__fullmatrix_gates.append((qt.Qobj(qutrit_matrices.Z_01), control, target))
         
-        self.__controlled_gate_ASCII_block(ZERO_ONE_ASCII, control, target)
+        self.__controlled_gate_ASCII_block(ascii_gates.ZERO_ONE_ASCII, control, target)
         gate_data = {'name': '01', 'control': control, 'target': target, 'color': '#e9c46a', 'column': len(self.__mpl_circuit_visualization_list)}
         self.__mpl_circuit_visualization_list.append(gate_data)   
 
     def c_zero_two(self, control, target):
-    """
-    If the control is in state |2⟩ apply qutrit gate 02 to the target qudit.
+        """
+        If the control is in state |2⟩ apply qutrit gate 02 to the target qudit.
 
-    Args:
-        control (int): Index of the control qudit.
-        target (int): Index of the target qudit.
+        Args:
+            control (int): Index of the control qudit.
+            target (int): Index of the target qudit.
 
-    Raises:
-        ValueError: If the circuit is configured with more than 3 basis states.
-    """         
+        Raises:
+            ValueError: If the circuit is configured with more than 3 basis states.
+        """         
         if self.num_states> 3:
          raise ValueError(f"Trying to insert a Qutrit gate in a >3 states qudit circuit")         
-        self.__einsum_gates.append((Z_02,control,target))
-        self.__controlled_gate_ASCII_block(ZERO_TWO_ASCII, control, target)
-        self.__fullmatrix_gates.append((qt.Qobj(Z_02), control, target))
+        self.__einsum_gates.append((qutrit_matrices.Z_02,control,target))
+        self.__controlled_gate_ASCII_block(ascii_gates.ZERO_TWO_ASCII, control, target)
+        self.__fullmatrix_gates.append((qt.Qobj(qutrit_matrices.Z_02), control, target))
         
         gate_data = {'name': '02', 'control': control, 'target': target, 'color': '#f4a261', 'column': len(self.__mpl_circuit_visualization_list)}
         self.__mpl_circuit_visualization_list.append(gate_data) 
@@ -276,51 +276,51 @@ class QuditCircuit:
     # Following two functions are for general Qudit gate construction (user manually inserts the matrices).
     # These are meant for circuit with more than 3 basis states.
     def custom_gate(self, gate, target, name: str = 'CUST'):
-    """
-    Apply a custom single-qudit gate. 
-    gate must be a matrix in the form of numpy.array.
+        """
+        Apply a custom single-qudit gate. 
+        gate must be a matrix in the form of numpy.array.
 
-    Args:
-        gate (np.ndarray): Unitary matrix representing the gate.
-        target (int): Index of the target qudit.
-        name (str): Gate label (max 4 characters) for visualization.
+        Args:
+            gate (np.ndarray): Unitary matrix representing the gate.
+            target (int): Index of the target qudit.
+            name (str): Gate label (max 4 characters) for visualization.
 
-    Raises:
-        ValueError: If name exceeds 4 characters.
-    """
+        Raises:
+            ValueError: If name exceeds 4 characters.
+        """
         if len(name) > 4: # Ensure the gate name fits in ASCII visualization (max 4 characters)
          raise ValueError(f"Name of the gate must be of max 4 chars")  
             
         self.__einsum_gates.append((gate,target))
         self.__fullmatrix_gates.append((qt.Qobj(gate), target))
         
-        self.__simple_gate_ASCII_block(custom_ascii(name), target)
+        self.__simple_gate_ASCII_block(ascii_gates.custom_ascii(name), target)
         gate_data = {'name': name, 'target': target, 'color': '#C7D3D4', 'column': len(self.__mpl_circuit_visualization_list)}
         self.__mpl_circuit_visualization_list.append(gate_data)           
         
     def c_custom_gate(self, gate, control, target, name: str = 'CUST'):
-    """
-    Apply a custom controlled qudit gate.
+        """
+        Apply a custom controlled qudit gate.
 
-    The gate is applied to the target qudit only when the control qudit is in the |d−1⟩ state (with d being the basis states of the circuit).
-    gate must be a matrix in the form of numpy.array.
+        The gate is applied to the target qudit only when the control qudit is in the |d−1⟩ state (with d being the basis states of the circuit).
+        gate must be a matrix in the form of numpy.array.
 
-    Args:
-        gate (np.ndarray): Unitary matrix representing the gate.
-        control (int): Index of the control qudit.
-        target (int): Index of the target qudit.
-        name (str): Gate label (max 4 characters) for visualization.
+        Args:
+            gate (np.ndarray): Unitary matrix representing the gate.
+            control (int): Index of the control qudit.
+            target (int): Index of the target qudit.
+            name (str): Gate label (max 4 characters) for visualization.
 
-    Raises:
-        ValueError: If name exceeds 4 characters.
-    """ 
+        Raises:
+            ValueError: If name exceeds 4 characters.
+        """ 
         if len(name) > 4:
          raise ValueError(f"Name of the gate must be of max 4 chars")
          
         self.__einsum_gates.append((gate, control, target))
         self.__fullmatrix_gates.append((qt.Qobj(gate), control, target))
         
-        self.__controlled_gate_ASCII_block(custom_ascii(name), control, target)
+        self.__controlled_gate_ASCII_block(ascii_gates.custom_ascii(name), control, target)
         gate_data = {'name': name, 'control': control, 'target': target, 'color': '#603F83', 'column': len(self.__mpl_circuit_visualization_list)}
         self.__mpl_circuit_visualization_list.append(gate_data)
 
@@ -477,12 +477,12 @@ class QuditCircuit:
     def __simple_gate_ASCII_block(self, GATE_ASCII, target): # Used for the visual representation of single qudit gates
         block = []
         for _ in range(target):
-            block.extend(WIRE_ASCII) # Empty wires on qudits before the target qudit
+            block.extend(ascii_gates.WIRE_ASCII) # Empty wires on qudits before the target qudit
 
         block.extend(GATE_ASCII) # Visual representation of the gate on the target qudit 
 
         for _ in range(self.num_qudit - target - 1): # Empty wires on qudits after the target qudit
-            block.extend(WIRE_ASCII)
+            block.extend(ascii_gates.WIRE_ASCII)
         self.__ascii_circuit_visualization_list.append(block)
         
     def __controlled_gate_ASCII_block(self, GATE_ASCII, control, target): # Used for the visual representation of a controlled gate
@@ -490,34 +490,34 @@ class QuditCircuit:
         
         if target > control: # Based on the position of the target and the control we have 2 different codes
             for _ in range(control):
-                block.extend(WIRE_ASCII) # Empty wires before the control
-            block.extend(CONTROL_ASCII) # Visual representation of the control symbol on the control qudit
+                block.extend(ascii_gates.WIRE_ASCII) # Empty wires before the control
+            block.extend(ascii_gates.CONTROL_ASCII) # Visual representation of the control symbol on the control qudit
             for _ in range(target - control - 1): # Line that connects control to the gate on target qudit 
-                block.extend(LINE_ASCII)
+                block.extend(ascii_gates.LINE_ASCII)
 
             block.extend(GATE_ASCII) # Visual representation of the gate on the target qudit 
 
             for _ in range(self.num_qudit - target - 1):
-                block.extend(WIRE_ASCII)
+                block.extend(ascii_gates.WIRE_ASCII)
             self.__ascii_circuit_visualization_list.append(block)
             
         else: # Mirrored version of the previous 'if'
             for _ in range(target):
-                block.extend(WIRE_ASCII)
+                block.extend(ascii_gates.WIRE_ASCII)
             block.extend(GATE_ASCII)
             for _ in range(control - target - 1):
-                block.extend(LINE_ASCII)
+                block.extend(ascii_gates.LINE_ASCII)
 
-            block.extend(CONTROL_ASCII_REV)
+            block.extend(ascii_gates.CONTROL_ASCII_REV)
 
             for _ in range(self.num_qudit - control - 1):
-                block.extend(WIRE_ASCII)
+                block.extend(ascii_gates.WIRE_ASCII)
             self.__ascii_circuit_visualization_list.append(block)
             
     def __barrier_ASCII_block(self): # Barrier lines
         block = []
         for _ in range(self.num_qudit): 
-            block.extend(BARRIER_ASCII)
+            block.extend(ascii_gates.BARRIER_ASCII)
         self.__ascii_circuit_visualization_list.append(block)
                 
             
