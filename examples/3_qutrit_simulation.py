@@ -1,3 +1,5 @@
+from qudit_circuit import QuditCircuit
+
 example = QuditCircuit(num_qudit=3)
 
 example.plus1(target=1)
