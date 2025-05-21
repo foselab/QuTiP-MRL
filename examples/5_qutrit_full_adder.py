@@ -1,3 +1,5 @@
+from qudit_circuit import QuditCircuit
+
 full_adder = QuditCircuit(4) # Circuit initialization, 4 qutrits
 
 # As in Qiskit qutrit are all in state 0 at the beginning
