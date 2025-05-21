@@ -1,3 +1,5 @@
+from qudit_circuit import QuditCircuit
+
 example = QuditCircuit(num_qudit=3,num_states=4)
 
 m1 = np.array([    # Exchanges the Qudit states 0 and 1 (0->1,1->0)
