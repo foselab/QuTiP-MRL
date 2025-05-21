@@ -361,8 +361,11 @@ class QuditCircuit:
              op_matrix, control_index, target_index = gate
              full_op = self.__controlled_qudit_gate(op_matrix, control_index, target_index)
             # Applies the returned operator to the final state evolving it
-            final_state = full_op * final_state   
-
+            final_state = full_op * final_state 
+            
+        # Converts the final state in a Qobj to allow the use of ptrace and the final probabilities measurment
+        final_state_tensor = qt.Qobj(final_state.full(), dims=[[self.num_states] * self.num_qudit, [1] * self.num_qudit]) 
+        
         # SECTION TO PRINT QUDIT DENSITY MATRICES
         for i in range(self.num_qudit): # From the final state it retrieves the (num_states x num_states) matrix of each qudit and prints it
          state = final_state_tensor.ptrace(i)
