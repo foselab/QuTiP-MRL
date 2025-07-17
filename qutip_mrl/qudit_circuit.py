@@ -204,7 +204,26 @@ class QuditCircuit:
         
         self.__controlled_gate_ASCII_block(ascii_gates.PLUS2_ASCII, control, target)
         gate_data = {'name': '+2', 'control': control, 'target': target, 'color': '#0081a7', 'column': len(self.__mpl_circuit_visualization_list)}
-        self.__mpl_circuit_visualization_list.append(gate_data)          
+        self.__mpl_circuit_visualization_list.append(gate_data)       
+
+    def c_feynman_2(self, A, B, C):
+        """
+        It applies a ternary controlled feynman gate
+
+        Args:
+            A (int): Index of the A qudit.
+            B (int): Index of the B qudit.
+            C (int): Index of the C qudit.
+
+        Raises:
+            ValueError: If the circuit is configured with more than 3 basis states.
+        """            
+        if self.num_states> 3:
+         raise ValueError(f"Trying to insert a Qutrit gate in a >3 states qudit circuit")  
+        self.c_plus2(B, C)
+        self.c_one_two(A, B)
+        self.c_plus1(B, C)
+        self.c_one_two(A, B)          
 
     def c_one_two(self, control, target):
         """
