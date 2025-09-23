@@ -66,3 +66,4 @@ Qobj data =
  [0. 0. 1.]]
 '''
 
+print("Output vector:", example.get_output())

@@ -463,7 +463,61 @@ class QuditCircuit:
         print(f"QUDIT {i} state probabilities:")
         for values in q:
          print(f"  {values:.0f}")
-  
+
+    def get_output(self):
+     """
+     Simulates the execution of the quantum circuit using Einstein summation (einsum) and returns a vector with the value of each qudit
+     
+     This method evolves the state of the circuit with tensor contractions using NumPy's einsum.
+     It allows the simulation of circuits with a relatively large number of qudits, as it avoids explicit matrix multiplication.
+     The number of qudits that is possible to use in the circuits depends on the number of states of the qudit.
+     Generally a maximum of 17 qutrits can be used with this kind of simulation.
+     
+     The quantum state is represented as a multidimensional tensor with shape [d, d, ..., d] (one axis per qudit) where d is the number of states.
+     The gates are applied via einsum string manipulation, with index-wise operations.
+     Controlled gates are only applied if the control qudit is in the num_states-1⟩ state.
+
+     Output:
+     A vector with the value of each qudit after circuit execution
+     """  
+
+     qudit_states = [] # Created to later print the results
+    
+     state = np.zeros([self.num_states] * self.num_qudit, dtype="complex64") # Prepares initial state with all qudit in |0⟩ state
+     state[(0,) * self.num_qudit] = 1.0
+     
+     for gate in self.__einsum_gates: 
+        if len(gate) == 2: # Checks if the gate is a simple gate or a controlled one
+            op_matrix, target_index = gate
+        elif len(gate) == 3:
+            op_matrix, control_index, target_index = gate
+            
+            # Retrives the state of the control qudit
+            axes = tuple(j for j in range(self.num_qudit) if j != control_index)
+            control_state = np.sum(np.abs(state)**2, axis=axes)
+            # If is not in the state |self.num_states-1⟩ it exits the for
+            target_state = np.zeros(self.num_states)
+            target_state[self.num_states - 1] = 1  # |self.num_states-1⟩
+            if not np.allclose(control_state, target_state):
+                continue
+            
+        # Applies the given gate on the target qudit
+        indices = [chr(ord('a') + i) for i in range(self.num_qudit)] # Creates indices (ex. abc)
+        einsum_str = f"{''.join(indices)},{indices[target_index]}x->" 
+        indices[target_index] = 'x'
+        einsum_str += ''.join(indices) # With these 3 lines the index of the target qudit is swap with 'x' (ex. abc,bx->axc)
+        state = np.einsum(einsum_str, state, op_matrix.T) # We generate the state of the circuit with einsum 
+
+     for i in range(self.num_qudit): # Analog to the code where the control qudit state is retrieved, here we retrieve the state of all qudits
+        axes = tuple(j for j in range(self.num_qudit) if j != i)
+        reduced = np.sum(np.abs(state)**2, axis=axes)
+        qudit_states.append(reduced)
+        
+     result = []
+     for i, q in enumerate(qudit_states): 
+        result.append(np.argmax(q)) # Takes the index of the maximum value of each qudit state, which corresponds to the qudit value
+     return result
+     
         
     def draw(self,mode='ascii'):
         """
