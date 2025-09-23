@@ -92,5 +92,7 @@ QUDIT 2 state probabilities:
   1
 '''
 
+print (equality.get_output([1,1,0]))
+
 
 
