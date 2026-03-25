@@ -150,6 +150,12 @@ def apply_gate(state: Tuple[int, ...], gate: Gate) -> Tuple[int, ...]:
             lines[tgt] = QSG_TABLE[key][lines[tgt]]
         return tuple(lines)
 
+    if gtype.startswith("C3Z") and QUBASE == 3:
+        key = gtype[3:]
+        if lines[ctrl] == 3:
+            lines[tgt] = QSG_TABLE[key][lines[tgt]]
+        return tuple(lines)
+
     raise ValueError(f"Unsupported gate type: {gtype}")
 
 
