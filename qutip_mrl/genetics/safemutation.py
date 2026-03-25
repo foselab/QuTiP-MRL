@@ -4,7 +4,7 @@ from __future__ import annotations
 import random
 from copy import deepcopy
 from typing import List
-from config import *
+from .config import *
 
 from jmetal.operator.mutation import Mutation
 

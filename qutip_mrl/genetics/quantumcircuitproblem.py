@@ -1,11 +1,8 @@
 # quantumcircuitproblem.py
 
 from __future__ import annotations
-
 from typing import Dict, Tuple, List, Optional
-
 from jmetal.core.problem import Problem
-
 from .circuitsolution import CircuitSolution
 from . import util
 

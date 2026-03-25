@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Dict, Tuple, List, Optional, Union, Literal, Iterable
 from jmetal.operator.selection import BinaryTournamentSelection
 from jmetal.util.termination_criterion import TerminationCriterion
-from .qudit_circuit import QuditCircuit
+from ..qudit_circuit import QuditCircuit
 from .quantumcircuitproblem import QuantumCircuitProblem
 from .safemutation import CircuitMutation
 from .circuitcrossover import CircuitCrossover

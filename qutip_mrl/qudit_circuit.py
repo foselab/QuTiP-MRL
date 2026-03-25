@@ -876,7 +876,22 @@ class QuditCircuit:
             target_state = np.zeros(self.num_states)
             target_state[self.num_states - 1] = 1  # |self.num_states-1⟩
             if not np.allclose(control_state, target_state):
+                continue  
+        elif len(gate) == 5:
+            _, op_matrix, c1, target_index, v = gate
+            control_indices = [c1]
+            values = [v]
+
+            # Retrieves the state of the control qudit
+            axes = tuple(j for j in range(self.num_qudit) if j != c1)
+            control_state = np.sum(np.abs(state) ** 2, axis=axes)
+            target_state = np.zeros(self.num_states)
+            target_state[v] = 1
+            if not np.allclose(control_state, target_state):
                 continue
+        else:
+            print(gate)
+            raise ValueError("Unforeseen gate length: " + str(len(gate)))          
             
         # Applies the given gate on the target qudit
         indices = [chr(ord('a') + i) for i in range(self.num_qudit)] # Creates indices (ex. abc)
